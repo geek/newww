@@ -34,8 +34,8 @@ describe('GET /settings/billing', function () {
     licenseMock = nock("https://license-api-example.com:443")
       .get("/customer/bob/stripe").times(14)
       .reply(200, fixtures.customers.happy)
-      .get("/customer/bob/stripe/subscription").times(14)
-      .reply(200, fixtures.customers.bob_subscriptions);
+      // .get("/customer/bob/stripe/subscription").times(14)
+      // .reply(200, fixtures.customers.bob_subscriptions);
 
     done();
   });
@@ -186,9 +186,7 @@ describe('GET /settings/billing', function () {
 
       licenseMock = nock("https://license-api-example.com")
         .get("/customer/bob/stripe").times(2)
-        .reply(200, fixtures.customers.happy)
-        .get("/customer/bob/stripe/subscription").times(2)
-        .reply(200, fixtures.customers.bob_subscriptions);
+        .reply(200, fixtures.customers.happy);
 
       var options = {
         method: "get",
@@ -276,9 +274,7 @@ describe('GET /settings/billing', function () {
 
       licenseMock = nock("https://license-api-example.com")
         .get("/customer/diana_delinquent/stripe").times(2)
-        .reply(200, fixtures.customers.license_expired)
-        .get("/customer/diana_delinquent/stripe/subscription").times(2)
-        .reply(200, []);
+        .reply(200, fixtures.customers.license_expired);
 
       server.inject(options, function (response) {
         resp = response;
@@ -324,8 +320,8 @@ describe('GET /settings/billing', function () {
       licenseMock = nock("https://license-api-example.com")
         .get("/customer/norbert_newbie/stripe")
         .reply(200, fixtures.customers.happy)
-        .get("/customer/norbert_newbie/stripe/subscription")
-        .reply(200, fixtures.customers.bob_subscriptions)
+        // .get("/customer/norbert_newbie/stripe/subscription")
+        // .reply(200, fixtures.customers.bob_subscriptions)
         .get("/customer/norbert_newbie/stripe")
         .reply(404);
 
@@ -348,7 +344,7 @@ describe('GET /settings/billing', function () {
     });
 
     it("displays a submit button with creation verbiage", function(done){
-      expect($("#payment-form input[type=submit]").attr("value")).to.equal("sign me up");
+      expect($("#payment-form input[type=submit]").attr("value")).to.equal("save my billing info");
       done();
     });
 
@@ -438,10 +434,10 @@ describe('POST /settings/billing', function () {
         var licenseMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe").times(2)
           .reply(200, fixtures.customers.happy)
-          .get("/customer/bob/stripe/subscription").times(2)
-          .reply(200, fixtures.customers.bob_subscriptions)
-          .put("/customer/bob/stripe/subscription",  {"plan":"npm-paid-individual-user-7"})
-          .reply(200)
+          // .get("/customer/bob/stripe/subscription").times(2)
+          // .reply(200, fixtures.customers.bob_subscriptions)
+          // .put("/customer/bob/stripe/subscription",  {"plan":"npm-paid-individual-user-7"})
+          // .reply(200)
           .post("/customer/bob/stripe")
           .reply(200, fixtures.customers.happy);
 
@@ -477,8 +473,8 @@ describe('POST /settings/billing', function () {
         var licenseMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe").twice()
           .reply(200, fixtures.customers.happy)
-          .get("/customer/bob/stripe/subscription").times(2)
-          .reply(200, fixtures.customers.bob_subscriptions)
+          // .get("/customer/bob/stripe/subscription").times(2)
+          // .reply(200, fixtures.customers.bob_subscriptions)
           .post("/customer/bob/stripe")
           .reply(200, "Your card's security code is incorrect.");
 
@@ -521,8 +517,8 @@ describe('POST /settings/billing', function () {
         var licenseMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe").times(2)
           .reply(404)
-          .put("/customer/bob/stripe/subscription",  {"plan":"npm-paid-individual-user-7"})
-          .reply(200)
+          // .put("/customer/bob/stripe/subscription",  {"plan":"npm-paid-individual-user-7"})
+          // .reply(200)
           .put("/customer/stripe")
           .reply(200, fixtures.customers.happy);
 
@@ -566,10 +562,10 @@ describe('POST /settings/billing', function () {
         var licenseMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe").times(2)
           .reply(200, fixtures.customers.happy)
-          .get("/customer/bob/stripe/subscription").times(2)
-          .reply(200, fixtures.customers.bob_subscriptions)
-          .put("/customer/bob/stripe/subscription",  {"plan":"npm-paid-individual-user-7"})
-          .reply(200)
+          // .get("/customer/bob/stripe/subscription").times(2)
+          // .reply(200, fixtures.customers.bob_subscriptions)
+          // .put("/customer/bob/stripe/subscription",  {"plan":"npm-paid-individual-user-7"})
+          // .reply(200)
           .post("/customer/bob/stripe", {"name":"bob","email":"bob@boom.me","card":"tok_1234567890"})
           .reply(200);
 
@@ -612,11 +608,11 @@ describe("subscribing to an org", function () {
       var customerMock = nock("https://license-api-example.com")
         .get("/customer/bob/stripe")
         .reply(200, fixtures.customers.happy)
-        .put("/customer/bob/stripe/subscription", {
-          plan: "npm-paid-org-6",
-          npm_org: "boomer"
-        })
-        .reply(200);
+        // .put("/customer/bob/stripe/subscription", {
+        //   plan: "npm-paid-org-6",
+        //   npm_org: "boomer"
+        // })
+        // .reply(200);
 
       server.inject(opts, function (resp) {
         userMock.done();
@@ -628,44 +624,44 @@ describe("subscribing to an org", function () {
     });
   });
 
-  it("allows a super-user to pay for an organization that exists but is not yet paid for", function (done) {
-    generateCrumb(server, function (crumb) {
-      var opts = {
-        url: '/settings/billing/subscribe',
-        method: 'POST',
-        credentials: fixtures.users.bob,
-        payload: {
-          planType: 'orgs',
-          orgName: 'boomer',
-          crumb: crumb
-        },
-        headers: { cookie: 'crumb=' + crumb }
-      };
+  // it("allows a super-user to pay for an organization that exists but is not yet paid for", function (done) {
+  //   generateCrumb(server, function (crumb) {
+  //     var opts = {
+  //       url: '/settings/billing/subscribe',
+  //       method: 'POST',
+  //       credentials: fixtures.users.bob,
+  //       payload: {
+  //         planType: 'orgs',
+  //         orgName: 'boomer',
+  //         crumb: crumb
+  //       },
+  //       headers: { cookie: 'crumb=' + crumb }
+  //     };
 
-      var userMock = nock("https://user-api-example.com")
-        .get("/user/bob")
-        .reply(200, fixtures.users.bob)
-        .get("/org/boomer/user")
-        .reply(200, {"count":1,"items":[fixtures.users.bob]});
+  //     var userMock = nock("https://user-api-example.com")
+  //       .get("/user/bob")
+  //       .reply(200, fixtures.users.bob)
+  //       .get("/org/boomer/user")
+  //       .reply(200, {"count":1,"items":[fixtures.users.bob]});
 
-      var customerMock = nock("https://license-api-example.com")
-        .get("/customer/bob/stripe")
-        .reply(200, fixtures.customers.happy)
-        .put("/customer/bob/stripe/subscription", {
-          plan: "npm-paid-org-6",
-          npm_org: "boomer"
-        })
-        .reply(200);
+  //     var customerMock = nock("https://license-api-example.com")
+  //       .get("/customer/bob/stripe")
+  //       .reply(200, fixtures.customers.happy)
+  //       .put("/customer/bob/stripe/subscription", {
+  //         plan: "npm-paid-org-6",
+  //         npm_org: "boomer"
+  //       })
+  //       .reply(200);
 
-      server.inject(opts, function (resp) {
-        userMock.done();
-        customerMock.done();
-        expect(resp.statusCode).to.equal(302);
-        expect(resp.headers.location).to.match(/\/settings\/billing/);
-        done();
-      });
-    });
-  });
+  //     server.inject(opts, function (resp) {
+  //       userMock.done();
+  //       customerMock.done();
+  //       expect(resp.statusCode).to.equal(302);
+  //       expect(resp.headers.location).to.match(/\/settings\/billing/);
+  //       done();
+  //     });
+  //   });
+  // });
 });
 
 
@@ -704,8 +700,6 @@ describe('POST /settings/billing/cancel', function () {
       var licenseMock = nock("https://license-api-example.com")
         .get("/customer/bob/stripe")
         .reply(200, fixtures.customers.happy)
-        .get("/customer/bob/stripe/subscription")
-        .reply(200, fixtures.customers.bob_subscriptions)
         .delete("/customer/bob/stripe")
         .reply(200, fixtures.customers.happy);
 
