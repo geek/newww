@@ -10,7 +10,7 @@ var fixtures = require("../fixtures"),
     after = lab.after,
     it = lab.test,
     expect = Code.expect,
-    server, userMock, licenseMock,
+    server,
     users = require('../fixtures').users;
 
 describe("package access", function(){
@@ -52,27 +52,17 @@ describe("package access", function(){
     var options = {url: '/package/browserify/access'};
     var mock;
 
-    before(function (done) {
-      mock = nock("https://user-api-example.com")
-        .get('/package/browserify')
-        .times(3)
-        .reply(200, fixtures.packages.browserify)
-        .get('/package/browserify/collaborators')
-        .times(3)
-        .reply(200, fixtures.collaborators);
-
-      done();
-    });
-
-    after(function (done) {
-      mock.done();
-      done();
-    });
-
     describe('anonymous user', function () {
 
       before(function(done) {
+        mock = nock("https://user-api-example.com")
+          .get('/package/browserify')
+          .reply(200, fixtures.packages.browserify)
+          .get('/package/browserify/collaborators')
+          .reply(200, fixtures.collaborators);
+
         server.inject(options, function(response) {
+          mock.done();
           resp = response;
           context = resp.request.response.source.context;
           $ = cheerio.load(resp.result);
@@ -115,21 +105,28 @@ describe("package access", function(){
       };
 
       before(function(done) {
-        userMock = nock("https://user-api-example.com")
+
+        var packageMock = nock("https://user-api-example.com")
+          .get('/package/browserify')
+          .reply(200, fixtures.packages.browserify)
+          .get('/package/browserify/collaborators')
+          .reply(200, fixtures.collaborators);
+
+        var userMock = nock("https://user-api-example.com")
           .get("/user/bob")
           .reply(200, users.bob);
 
-        licenseMock = nock("https://license-api-example.com")
+        var licenseMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe")
-          .reply(200, {})
-          .get("/customer/bob/stripe/subscription")
-          .reply(200, []);
+          .reply(200, {});
 
         server.inject(options, function(response) {
           userMock.done();
           licenseMock.done();
+          packageMock.done();
           resp = response;
           context = resp.request.response.source.context;
+          expect(resp.request.response.source.template).to.equal('package/access');
           $ = cheerio.load(resp.result);
           done();
         });
@@ -168,17 +165,22 @@ describe("package access", function(){
 
       before(function(done) {
 
-        userMock = nock("https://user-api-example.com")
+        var packageMock = nock("https://user-api-example.com")
+          .get('/package/browserify')
+          .reply(200, fixtures.packages.browserify)
+          .get('/package/browserify/collaborators')
+          .reply(200, fixtures.collaborators);
+
+        var userMock = nock("https://user-api-example.com")
           .get("/user/wrigley_the_writer")
           .reply(200, users.wrigley_the_writer);
 
-        licenseMock = nock("https://license-api-example.com")
+        var licenseMock = nock("https://license-api-example.com")
           .get("/customer/wrigley_the_writer/stripe")
-          .reply(200, {})
-          .get("/customer/wrigley_the_writer/stripe/subscription")
-          .reply(200, []);
+          .reply(200, {});
 
         server.inject(options, function(response) {
+          packageMock.done();
           userMock.done();
           licenseMock.done();
           resp = response;
@@ -240,18 +242,19 @@ describe("package access", function(){
     var resp;
     var context;
     var options = {url: '/package/@wrigley_the_writer/scoped_public/access'};
-    var mock = nock("https://user-api-example.com")
-      .get('/package/@wrigley_the_writer%2Fscoped_public')
-      .times(10)
-      .reply(200, fixtures.packages.wrigley_scoped_public)
-      .get('/package/@wrigley_the_writer%2Fscoped_public/collaborators')
-      .times(10)
-      .reply(200, fixtures.collaborators);
 
     describe('anonymous user', function () {
 
       before(function(done) {
+
+        var mock = nock("https://user-api-example.com")
+          .get('/package/@wrigley_the_writer%2Fscoped_public')
+          .reply(200, fixtures.packages.wrigley_scoped_public)
+          .get('/package/@wrigley_the_writer%2Fscoped_public/collaborators')
+          .reply(200, fixtures.collaborators);
+
         server.inject(options, function(response) {
+          mock.done();
           resp = response;
           context = resp.request.response.source.context;
           $ = cheerio.load(resp.result);
@@ -294,17 +297,22 @@ describe("package access", function(){
       };
 
       before(function(done) {
-        userMock = nock("https://user-api-example.com")
+        var packageMock = nock("https://user-api-example.com")
+          .get('/package/@wrigley_the_writer%2Fscoped_public')
+          .reply(200, fixtures.packages.wrigley_scoped_public)
+          .get('/package/@wrigley_the_writer%2Fscoped_public/collaborators')
+          .reply(200, fixtures.collaborators);
+
+        var userMock = nock("https://user-api-example.com")
           .get("/user/bob")
           .reply(200, users.bob);
 
-        licenseMock = nock("https://license-api-example.com")
+        var licenseMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe")
-          .reply(200, {})
-          .get("/customer/bob/stripe/subscription")
-          .reply(200, []);
+          .reply(200, {});
 
         server.inject(options, function(response) {
+          packageMock.done();
           userMock.done();
           licenseMock.done();
           resp = response;
@@ -346,17 +354,22 @@ describe("package access", function(){
       };
 
       before(function(done) {
-        userMock = nock("https://user-api-example.com")
+        var packageMock = nock("https://user-api-example.com")
+          .get('/package/@wrigley_the_writer%2Fscoped_public')
+          .reply(200, fixtures.packages.wrigley_scoped_public)
+          .get('/package/@wrigley_the_writer%2Fscoped_public/collaborators')
+          .reply(200, fixtures.collaborators);
+
+        var userMock = nock("https://user-api-example.com")
           .get("/user/ralph_the_reader")
           .reply(200, users.ralph_the_reader);
 
-        licenseMock = nock("https://license-api-example.com")
+        var licenseMock = nock("https://license-api-example.com")
           .get("/customer/ralph_the_reader/stripe")
-          .reply(200, {})
-          .get("/customer/ralph_the_reader/stripe/subscription")
-          .reply(200, []);
+          .reply(200, {});
 
         server.inject(options, function(response) {
+          packageMock.done();
           userMock.done();
           licenseMock.done();
           resp = response;
@@ -395,17 +408,22 @@ describe("package access", function(){
       };
 
       before(function(done) {
-        userMock = nock("https://user-api-example.com")
+        var packageMock = nock("https://user-api-example.com")
+          .get('/package/@wrigley_the_writer%2Fscoped_public')
+          .reply(200, fixtures.packages.wrigley_scoped_public)
+          .get('/package/@wrigley_the_writer%2Fscoped_public/collaborators')
+          .reply(200, fixtures.collaborators);
+
+        var userMock = nock("https://user-api-example.com")
           .get("/user/wrigley_the_writer")
           .reply(200, users.wrigley_the_writer);
 
-        licenseMock = nock("https://license-api-example.com")
+        var licenseMock = nock("https://license-api-example.com")
           .get("/customer/wrigley_the_writer/stripe").twice()
-          .reply(200, fixtures.customers.happy)
-          .get("/customer/wrigley_the_writer/stripe/subscription").twice()
-          .reply(200, fixtures.customers.bob_subscriptions);
+          .reply(200, fixtures.customers.happy);
 
         server.inject(options, function(response) {
+          packageMock.done();
           userMock.done();
           licenseMock.done();
           resp = response;
@@ -466,15 +484,22 @@ describe("package access", function(){
       };
 
       before(function(done) {
-        userMock = nock("https://user-api-example.com")
+        var packageMock = nock("https://user-api-example.com")
+          .get('/package/@wrigley_the_writer%2Fscoped_public')
+          .reply(200, fixtures.packages.wrigley_scoped_public)
+          .get('/package/@wrigley_the_writer%2Fscoped_public/collaborators')
+          .reply(200, fixtures.collaborators);
+
+        var userMock = nock("https://user-api-example.com")
           .get("/user/wrigley_the_writer")
           .reply(200, fixtures.users.wrigley_the_writer);
 
-        licenseMock = nock("https://license-api-example.com")
+        var licenseMock = nock("https://license-api-example.com")
           .get("/customer/wrigley_the_writer/stripe").twice()
           .reply(404);
 
         server.inject(options, function(response) {
+          packageMock.done();
           userMock.done();
           licenseMock.done();
           $ = cheerio.load(response.result);
@@ -553,9 +578,7 @@ describe("package access", function(){
 
         var customerMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe")
-          .reply(200, {})
-          .get("/customer/bob/stripe/subscription")
-          .reply(200, []);
+          .reply(200, {});
 
         server.inject(options, function(response) {
           userMock.done();
@@ -599,9 +622,7 @@ describe("package access", function(){
 
         var customerMock = nock("https://license-api-example.com")
           .get("/customer/ralph_the_reader/stripe")
-          .reply(200, {})
-          .get("/customer/ralph_the_reader/stripe/subscription")
-          .reply(200, []);
+          .reply(200, {});
 
         server.inject(options, function(response) {
           userMock.done();
@@ -640,9 +661,7 @@ describe("package access", function(){
 
         var customerMock = nock("https://license-api-example.com")
           .get("/customer/wrigley_the_writer/stripe")
-          .reply(200, {})
-          .get("/customer/wrigley_the_writer/stripe/subscription")
-          .reply(200, []);
+          .reply(200, {});
 
         server.inject(options, function(response) {
           userMock.done();
@@ -685,9 +704,7 @@ describe("package access", function(){
 
         var customerMock = nock("https://license-api-example.com")
           .get("/customer/wrigley_the_writer/stripe")
-          .reply(200, {})
-          .get("/customer/wrigley_the_writer/stripe/subscription")
-          .reply(200, []);
+          .reply(200, {});
 
         server.inject(options, function(response) {
           userMock.done();
