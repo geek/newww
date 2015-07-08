@@ -249,8 +249,6 @@ User.prototype.createOrg = function (orgName, callback) {
 User.prototype.getOrg = function (orgName, callback) {
   var url = fmt('%s/org/%s/user', this.host, orgName);
 
-  console.log('boom!', url)
-
   return new P(function (resolve, reject) {
 
     Request.get({url: url, json: true}, function (err, resp, body) {

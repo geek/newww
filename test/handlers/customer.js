@@ -608,17 +608,54 @@ describe("subscribing to an org", function () {
       var customerMock = nock("https://license-api-example.com")
         .get("/customer/bob/stripe")
         .reply(200, fixtures.customers.happy)
-        // .put("/customer/bob/stripe/subscription", {
-        //   plan: "npm-paid-org-6",
-        //   npm_org: "boomer"
-        // })
-        // .reply(200);
+        .put("/customer/bob/stripe/subscription", {
+          plan: "npm-paid-org-6",
+          npm_org: "boomer"
+        })
+        .reply(200);
 
       server.inject(opts, function (resp) {
         userMock.done();
         customerMock.done();
         expect(resp.statusCode).to.equal(302);
         expect(resp.headers.location).to.match(/\/settings\/billing/);
+        done();
+      });
+    });
+  });
+
+  it("returns an error if the organization already exists", function (done) {
+    generateCrumb(server, function (crumb) {
+      var opts = {
+        url: '/settings/billing/subscribe',
+        method: 'POST',
+        credentials: fixtures.users.bob,
+        payload: {
+          planType: 'orgs',
+          orgName: 'boomer',
+          crumb: crumb
+        },
+        headers: { cookie: 'crumb=' + crumb }
+      };
+
+      var userMock = nock("https://user-api-example.com")
+        .get("/user/bob")
+        .reply(200, fixtures.users.bob)
+        .get("/org/boomer/user")
+        .reply(200, {"count":1,"items":[fixtures.users.bob]});
+
+      var customerMock = nock("https://license-api-example.com")
+        .get("/customer/bob/stripe")
+        .reply(200, fixtures.customers.happy);
+
+      server.inject(opts, function (resp) {
+        userMock.done();
+        customerMock.done();
+        expect(resp.statusCode).to.equal(200);
+        expect(resp.request.response.source.template).to.equal('user/billing');
+        var $ = cheerio.load(resp.result);
+        expect($('.errors li')[0].children.length).to.equal(1);
+        expect($('.errors li')[0].children[0].data).to.equal("Error: Org already exists.");
         done();
       });
     });
