@@ -14,6 +14,7 @@ var generateCrumb = require("../handlers/crumb.js"),
     fixtures = require('../fixtures');
 
 before(function (done) {
+  process.env.FEATURE_ORG_BILLING = 'true';
   require('../mocks/server')(function (obj) {
     server = obj;
     done();
@@ -21,6 +22,7 @@ before(function (done) {
 });
 
 after(function (done) {
+  delete process.env.FEATURE_ORG_BILLING;
   server.stop(done);
 });
 
@@ -33,9 +35,7 @@ describe('GET /settings/billing', function () {
 
     licenseMock = nock("https://license-api-example.com:443")
       .get("/customer/bob/stripe").times(14)
-      .reply(200, fixtures.customers.happy)
-      // .get("/customer/bob/stripe/subscription").times(14)
-      // .reply(200, fixtures.customers.bob_subscriptions);
+      .reply(200, fixtures.customers.happy);
 
     done();
   });
@@ -434,10 +434,6 @@ describe('POST /settings/billing', function () {
         var licenseMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe").times(2)
           .reply(200, fixtures.customers.happy)
-          // .get("/customer/bob/stripe/subscription").times(2)
-          // .reply(200, fixtures.customers.bob_subscriptions)
-          // .put("/customer/bob/stripe/subscription",  {"plan":"npm-paid-individual-user-7"})
-          // .reply(200)
           .post("/customer/bob/stripe")
           .reply(200, fixtures.customers.happy);
 
@@ -473,8 +469,6 @@ describe('POST /settings/billing', function () {
         var licenseMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe").twice()
           .reply(200, fixtures.customers.happy)
-          // .get("/customer/bob/stripe/subscription").times(2)
-          // .reply(200, fixtures.customers.bob_subscriptions)
           .post("/customer/bob/stripe")
           .reply(200, "Your card's security code is incorrect.");
 
@@ -517,8 +511,6 @@ describe('POST /settings/billing', function () {
         var licenseMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe").times(2)
           .reply(404)
-          // .put("/customer/bob/stripe/subscription",  {"plan":"npm-paid-individual-user-7"})
-          // .reply(200)
           .put("/customer/stripe")
           .reply(200, fixtures.customers.happy);
 
@@ -562,10 +554,6 @@ describe('POST /settings/billing', function () {
         var licenseMock = nock("https://license-api-example.com")
           .get("/customer/bob/stripe").times(2)
           .reply(200, fixtures.customers.happy)
-          // .get("/customer/bob/stripe/subscription").times(2)
-          // .reply(200, fixtures.customers.bob_subscriptions)
-          // .put("/customer/bob/stripe/subscription",  {"plan":"npm-paid-individual-user-7"})
-          // .reply(200)
           .post("/customer/bob/stripe", {"name":"bob","email":"bob@boom.me","card":"tok_1234567890"})
           .reply(200);
 
