@@ -589,7 +589,11 @@ describe("subscribing to an org", function () {
 
       var userMock = nock("https://user-api-example.com")
         .get("/user/bob")
-        .reply(200, fixtures.users.bob)
+        .reply(200, fixtures.users.bob);
+
+      var orgMock = nock("https://user-api-example.com")
+        .get("/org/boomer")
+        .reply(404, "not found")
         .get("/org/boomer/user")
         .reply(404, "not found");
 
@@ -604,6 +608,7 @@ describe("subscribing to an org", function () {
 
       server.inject(opts, function (resp) {
         userMock.done();
+        orgMock.done();
         customerMock.done();
         expect(resp.statusCode).to.equal(302);
         expect(resp.headers.location).to.match(/\/settings\/billing/);
@@ -628,7 +633,11 @@ describe("subscribing to an org", function () {
 
       var userMock = nock("https://user-api-example.com")
         .get("/user/bob")
-        .reply(200, fixtures.users.bob)
+        .reply(200, fixtures.users.bob);
+
+      var orgMock = nock("https://user-api-example.com")
+        .get("/org/boomer")
+        .reply(200, {"name":"boomer","description":"","resource":{},"created":"2015-07-10T20:29:37.816Z","updated":"2015-07-10T21:07:16.799Z","deleted":null})
         .get("/org/boomer/user")
         .reply(200, {"count":1,"items":[fixtures.users.bob]});
 
@@ -638,6 +647,7 @@ describe("subscribing to an org", function () {
 
       server.inject(opts, function (resp) {
         userMock.done();
+        orgMock.done();
         customerMock.done();
         expect(resp.statusCode).to.equal(200);
         expect(resp.request.response.source.template).to.equal('user/billing');
