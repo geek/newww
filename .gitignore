@@ -10,3 +10,5 @@ numbat-config.js
 config.admin.js
 static
 test/coverage.html
+
+.dropbox
