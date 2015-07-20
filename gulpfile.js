@@ -123,6 +123,6 @@ gulp.task('lint', function() {
     .pipe(jshint.reporter('default'));
 });
 
-gulp.task('build', ['fonts', 'images', 'misc', 'styles', 'browserify', 'concat', 'tota11y']);
-gulp.task('dev', ['build', 'nodemon', 'watch']);
+gulp.task('build', ['fonts', 'images', 'misc', 'styles', 'browserify', 'concat']);
+gulp.task('dev', ['build', 'tota11y', 'nodemon', 'watch']);
 gulp.task('default', ['build']);
