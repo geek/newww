@@ -227,15 +227,18 @@ describe("Customer", function(){
           product_id: '1031405a-70b7-4a3f-b552-8609d9e1428f'
         });
 
-    Customer.createSubscription(planInfo, function (err, subscription) {
-      customerMock.done();
-      expect(err).to.not.exist();
-      expect(subscription.id).to.equal('sub_12345');
-      expect(subscription.npm_org).to.equal('_private-modules-bob');
-      done();
+      Customer.createSubscription(planInfo, function (err, subscription) {
+        customerMock.done();
+        expect(err).to.not.exist();
+        expect(subscription.id).to.equal('sub_12345');
+        expect(subscription.npm_org).to.equal('_private-modules-bob');
+        done();
+      });
+
     });
 
     });
+
   });
 
   describe("del()", function() {
