@@ -595,6 +595,8 @@ describe("subscribing to an org", function () {
         .get("/org/boomer")
         .reply(404, "not found")
         .get("/org/boomer/user")
+        .reply(404, "not found")
+        .put("/org", { name: "boomer" })
         .reply(404, "not found");
 
       var customerMock = nock("https://license-api-example.com")
