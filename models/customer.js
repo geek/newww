@@ -97,13 +97,6 @@ Customer.prototype.updateBilling = function(body, callback) {
   });
 };
 
-Customer.prototype.createSubscription = function (planInfo, callback) {
-  var url = this.host + '/customer/' + this.name + '/stripe/subscription';
-  Request.put({ url: url, json: true, body: planInfo }, function (err, resp, body) {
-    callback(err, body);
-  });
-};
-
 Customer.prototype.del = function(callback) {
   var url = this.host + '/customer/' + this.name + '/stripe';
   Request.del({url: url, json: true}, function(err, resp, body){
@@ -111,14 +104,45 @@ Customer.prototype.del = function(callback) {
   });
 };
 
-Customer.prototype.getLicense = function (name, callback) {
-  var url = this.host + '/customer/' + name + '/license';
+Customer.prototype.createSubscription = function (planInfo, callback) {
+  var url = this.host + '/customer/' + this.name + '/stripe/subscription';
+  Request.put({ url: url, json: true, body: planInfo }, function (err, resp, body) {
+    callback(err, body);
+  });
+};
+
+Customer.prototype.getLicenseIdForOrg = function (orgName, callback) {
+  this.getSubscriptions(function (err, subscriptions) {
+    if (err) { return callback(err); }
+
+    var org = _.find(subscriptions, function (subscription) {
+      return orgName === subscription.npm_org;
+    });
+
+    if (!org) {
+      err = new Error('No org with that name exists');
+      return callback(err);
+    }
+
+    if (!org.license_id) {
+      err = new Error('That org does not have a license_id');
+      return callback(err);
+    }
+
+    return callback(null, org.license_id);
+  });
+};
+
+Customer.prototype.getAllSponsorships = function (licenseId, callback) {
+  var url = this.host + '/sponsorship/' + licenseId;
 
   Request.get({
     url: url,
     json: true
   }, function (err, resp, body) {
     if (err) { return callback(err); }
+
+
 
     return callback(null, body);
   });
@@ -150,18 +174,6 @@ Customer.prototype.acceptSponsorship = function (verificationKey, callback) {
   });
 };
 
-Customer.prototype.getAllSponsorships = function (licenseId, callback) {
-  var url = this.host + '/sponsorship/' + licenseId;
-
-  Request.get({
-    url: url,
-    json: true
-  }, function (err, resp, body) {
-    if (err) { callback(err); }
-    return callback(null, body);
-  });
-};
-
 Customer.prototype.removeSponsorship = function (npmUser, licenseId, callback) {
   var url = this.host + '/sponsorship/' + licenseId + '/decline/' + npmUser;
 
@@ -177,25 +189,3 @@ Customer.prototype.removeSponsorship = function (npmUser, licenseId, callback) {
 Customer.prototype.declineSponsorship =
   Customer.prototype.revokeSponsorship =
     Customer.prototype.removeSponsorship;
-
-Customer.prototype.getLicenseIdForOrg = function (orgName, callback) {
-  this.getSubscriptions(function (err, subscriptions) {
-    if (err) { return callback(err); }
-
-    var org = _.find(subscriptions, function (subscription) {
-      return orgName === subscription.npm_org;
-    });
-
-    if (!org) {
-      err = new Error('No org with that name exists');
-      return callback(err);
-    }
-
-    if (!org.license_id) {
-      err = new Error('That org does not have a license_id');
-      return callback(err);
-    }
-
-    return callback(null, org.license_id);
-  });
-};
