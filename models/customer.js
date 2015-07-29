@@ -183,6 +183,13 @@ Customer.prototype.acceptSponsorship = function (verificationKey, callback) {
     json: true
   }, function (err, resp, body) {
     if (err) { return callback(err); }
+
+    if (resp.statusCode === 404) {
+      err = Error('verification key not found');
+      err.statusCode = resp.statusCode;
+      return callback(err);
+    }
+
     return callback(null, body);
   });
 };
