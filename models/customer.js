@@ -177,7 +177,7 @@ Customer.prototype.extendSponsorship = function (licenseId, name, callback) {
 };
 
 Customer.prototype.acceptSponsorship = function (verificationKey, callback) {
-  var url = this.host + '/sponsorship/' + verificationKey + '/accept';
+  var url = this.host + '/sponsorship/' + verificationKey;
   Request.post({
     url: url,
     json: true
@@ -188,7 +188,7 @@ Customer.prototype.acceptSponsorship = function (verificationKey, callback) {
 };
 
 Customer.prototype.removeSponsorship = function (npmUser, licenseId, callback) {
-  var url = this.host + '/sponsorship/' + licenseId + '/decline/' + npmUser;
+  var url = this.host + '/sponsorship/' + licenseId + '/' + npmUser;
 
   Request.del({
     url: url,
