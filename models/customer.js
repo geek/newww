@@ -202,6 +202,13 @@ Customer.prototype.removeSponsorship = function (npmUser, licenseId, callback) {
     json: true
   }, function (err, resp, body) {
     if (err) { callback(err); }
+
+    if (resp.statusCode === 404) {
+      err = Error('user or licenseId not found');
+      err.statusCode = resp.statusCode;
+      return callback(err);
+    }
+
     return callback(null, body);
   });
 };
