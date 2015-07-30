@@ -133,9 +133,9 @@ Customer.prototype.getLicenseIdForOrg = function (orgName, callback) {
   });
 };
 
+// should this go into the org agent instead?
 Customer.prototype.getAllSponsorships = function (licenseId, callback) {
   var url = this.host + '/sponsorship/' + licenseId;
-
   Request.get({
     url: url,
     json: true
@@ -148,8 +148,6 @@ Customer.prototype.getAllSponsorships = function (licenseId, callback) {
       err.message = body;
       return callback(err);
     }
-
-
 
     return callback(null, body);
   });
