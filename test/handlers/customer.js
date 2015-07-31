@@ -603,7 +603,7 @@ describe("subscribing to an org", function () {
         .get("/customer/bob/stripe")
         .reply(200, fixtures.customers.happy)
         .put("/customer/bob/stripe/subscription", {
-          plan: "npm-paid-org-6",
+          plan: "npm-paid-org-7",
           npm_org: "boomer"
         })
         .reply(200);
@@ -685,7 +685,7 @@ describe("subscribing to an org", function () {
   //       .get("/customer/bob/stripe")
   //       .reply(200, fixtures.customers.happy)
   //       .put("/customer/bob/stripe/subscription", {
-  //         plan: "npm-paid-org-6",
+  //         plan: "npm-paid-org-7",
   //         npm_org: "boomer"
   //       })
   //       .reply(200);
