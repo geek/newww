@@ -43,6 +43,7 @@ Org.prototype.get = function (name, callback) {
 
   var orgUrl = USER_HOST + '/org/' + name;
   var userUrl = USER_HOST + '/org/' + name + '/user';
+  var packageUrl = USER_HOST + '/org/' + name + '/package';
 
   var makeRequest = function (url) {
     return function (cb) {
@@ -63,7 +64,8 @@ Org.prototype.get = function (name, callback) {
 
   var requests = {
     org: makeRequest(orgUrl),
-    users: makeRequest(userUrl)
+    users: makeRequest(userUrl),
+    packages: makeRequest(packageUrl)
   };
 
   async.parallel(requests, function (err, results) {
@@ -76,6 +78,7 @@ Org.prototype.get = function (name, callback) {
                   user.avatar = avatar(user.email);
                   return user;
                 });
+    org.packages = results.packages;
 
     return callback(null, org);
   });
