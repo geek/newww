@@ -182,6 +182,12 @@ Customer.prototype.acceptSponsorship = function (verificationKey, callback) {
   }, function (err, resp, body) {
     if (err) { return callback(err); }
 
+    if (resp.statusCode === 500) {
+      err = Error('user is already sponsored');
+      err.statusCode = 403;
+      return callback(err);
+    }
+
     if (resp.statusCode === 404) {
       err = Error('verification key not found');
       err.statusCode = resp.statusCode;
