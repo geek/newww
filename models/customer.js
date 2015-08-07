@@ -16,6 +16,33 @@ var Customer = module.exports = function(name, opts) {
   }, opts);
 };
 
+Customer.prototype.fetch = function(id, callback) {
+  var self = this;
+  var url = this.host + '/customer/' + id;
+
+  Request.get({
+    url: url,
+    json: true
+  }, function (err, resp, body) {
+
+    if (err) { return callback(err); }
+
+    if (resp.statusCode === 404) {
+      err = Error('customer not found: ' + self.name);
+      err.statusCode = resp.statusCode;
+      return callback(err);
+    }
+
+    if (resp.statusCode === 500) {
+      err = new Error(body);
+      err.statusCode = resp.statusCode;
+      return callback(err);
+    }
+
+    return callback(null, body);
+  });
+};
+
 Customer.prototype.get = function(callback) {
   var self = this;
   var stripeUrl = this.host + '/customer/' + self.name + '/stripe';
@@ -109,21 +136,6 @@ Customer.prototype.createSubscription = function (planInfo, callback) {
   Request.put({ url: url, json: true, body: planInfo }, function (err, resp, body) {
     callback(err, body);
   });
-};
-
-Customer.prototype.getLicense = function (callback) {
-  var url = this.host + '/customer/' + this.name + '/license';
-
-  Request.get({
-    url: url,
-    json: true
-  }, function (err, resp, body) {
-    if (err) {
-      return callback(err);
-    }
-    return callback(null, body);
-  });
-
 };
 
 Customer.prototype.getLicenseIdForOrg = function (orgName, callback) {
