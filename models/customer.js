@@ -111,6 +111,21 @@ Customer.prototype.createSubscription = function (planInfo, callback) {
   });
 };
 
+Customer.prototype.getLicense = function (callback) {
+  var url = this.host + '/customer/' + this.name + '/license';
+
+  Request.get({
+    url: url,
+    json: true
+  }, function (err, resp, body) {
+    if (err) {
+      return callback(err);
+    }
+    return callback(null, body);
+  });
+
+};
+
 Customer.prototype.getLicenseIdForOrg = function (orgName, callback) {
   this.getSubscriptions(function (err, subscriptions) {
     if (err) { return callback(err); }
